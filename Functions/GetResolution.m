@@ -58,10 +58,10 @@ function my_calculate_resolution(cutposA,cutposB)
     sigmaDisp=nanstd(res(:));%standard deviation
     tltres = sprintf('resolution in px = %.2f',sigmaDisp);
     tltdisp =sprintf('the shift is = %.2f',avgDisp);
-    xlabel({'Displacement by data' tltres tltdisp });
+    xlabel('Displacement by data');
     ylabel('Incidence');
     set(resh,'FaceColor','r','EdgeColor','r');
-    
+    title({tltres tltdisp});
     % % % % % %Compute cross correlation
 % % % % % XC=xcorr2(double(img1)-mean(mean(img1)),double(img2)-mean(mean(img2)));
 % % % % % 
@@ -172,7 +172,7 @@ function [posf1,posf2] = my_ReadBorderfiles(~)
     msg=sprintf('Coordinates loaded from %s and %s files',filenam1,filenam2);
     msgbox(msg);
     
-    %check nan values inside the 
+    %check nan values inside the border files and delete them
     if ~isempty(find(isnan(posf2),1))
         posf2(isnan(posf2))=[];%remove nan
         posf2 = reshape(posf2,[size(posf2,2)/2,2]);%reshape the set of points in 2 colomns(x and y)

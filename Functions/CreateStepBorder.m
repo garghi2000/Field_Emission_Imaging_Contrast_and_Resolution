@@ -46,7 +46,7 @@ function my_Plotdata(alldata)
     
     figure('Name','Data','NumberTitle','off','Units','normalized','pos', [0.0377 0.0667 0.3774 0.6667])
     imagesc(alldata);
-    tip= ['Click and drag the mouse to draw the contour'];
+    tip= {'Click and drag the mouse to draw' 'the contour of the region containing the border'};
     title(tip)
 my_SetImageDefaultProperties(alldata);
     hold on %keep the figure for next plot
@@ -73,7 +73,7 @@ function mask = my_Mask(alldata)
         end
         figure(gcf)
         imagesc(mask);
-        tip= ['THIS IS THE REGION SELECTED!'];
+        tip= 'THIS IS THE REGION SELECTED!';
         title(tip);
 my_SetSmallImageDefaultProperties(alldata);
     end
@@ -83,23 +83,24 @@ end
 % Do the routine to find the boundary points
 function pos = my_Findstep(alldata,mask)      
     % loop over every scan line 
-    masknan=mask;%initialization
     posx=zeros(1,size(alldata,1)); %initialization of the border points coordinates
     posy=posx;%initialization of the border points coordinate
-    regA=posx;%initialization
-    regB=posx;%initialization
     fitbar = waitbar(0,{'fitting the scan lines...' 'Please wait'});
     
     for i = 1:size(alldata,1)
         xnonzero = find(mask(i,:));%x coords of those non zero pxs inside the mask 
-        zer= find(~mask(i,:));
         posy(i) = i;
         if i == round(size(alldata,1)/3)
-            waitbar(.33,fitbar,{'fitting the scan lines...' 'Please wait'});
+            waitbar(.33,fitbar,{'fitting the scan lines.' 'Please wait'});
         end
         if i == round(size(alldata,1)*2/3)
-            waitbar(.66,fitbar,{'fitting the scan lines...' 'Please wait'});
+            waitbar(.66,fitbar,{'fitting the scan lines..' 'Please wait'});
         end
+        if i == round(size(alldata,1)-1)
+            waitbar(.99,fitbar,{'fitting the scan lines...' 'Please wait'});
+        end
+        
+        
         %check the scanline contains at least 3 points of the region interested
         if ~isempty(xnonzero) && (size(xnonzero,2)>=3) 
             %initialization of the fit, defining the guess coefficients
@@ -110,9 +111,10 @@ function pos = my_Findstep(alldata,mask)
             stepOffsetG = abs(mask(i,xnonzero(1)) - stepHightG);%D depends on A coef
             guessCoef=[stepHightG stepWidthG stepPosG stepOffsetG];%array of guess coefficients
             %fit
-            cfit = lsqnonlin(@my_tanhfit,guessCoef,[],[],[],xnonzero,mask(i,xnonzero))
+            cfit = lsqnonlin(@my_tanhfit,guessCoef,[],[],[],xnonzero,mask(i,xnonzero));
             cfit = abs(cfit);%avoiding negative coeff.
             posx(i) = cfit(3);
+            
 %%check every fit on the step
 %             fit=(-cfit(1).*tanh(cfit(2).*(xnonzero-cfit(3)))-cfit(4));
 %             fittest = (-guessCoef(1).*tanh(guessCoef(1).*(xnonzero-guessCoef(3)))-guessCoef(4));   
@@ -133,7 +135,7 @@ function pos = my_Findstep(alldata,mask)
     % plot the image with the boundary points found
     figure('Name','Border','NumberTitle','off','Units','normalized','pos', [0.0377 0.0667 0.3774 0.6667])
     imagesc(alldata);
-    tip= ['Border'];
+    tip= 'Border';
     title(tip)
 my_SetImageDefaultProperties(alldata)
 
@@ -153,10 +155,17 @@ function my_SavePoints(pos)
     prompt = {'Insert file name:'};
     titl = 'Save coordinates in txt file';
     dims = [1 40];
-    definput = {'StepBorder.txt'}
+    definput = {'StepBorder.txt'};
     filename = char(inputdlg(prompt,titl,dims,definput));
     fid = fopen(filename,'wt');
     pos=pos';
+    
+    if ~isempty(find(isnan(pos),1))
+        pos(isnan(pos))=[];%remove nan
+        pos = reshape(pos,[size(pos,2)/2,2]);%reshape the set of points in 2 colomns(x and y)
+    end
+    
+    
     fprintf(fid,'%f %f\n',pos); %overwrites previous data, data in pixels
     fclose('all');
     msg=sprintf('Coordinates saved in the %s file',filename);
