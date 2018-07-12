@@ -80,8 +80,6 @@ end
 function my_MakeBorderRoi(posA,posB)
     
     ca = gca;
-%         hA = impoly(ca,posA,'Closed',0,'PositionConstrainFcn',@my_interpolation)
-%         hB = impoly(ca,posB,'Closed',0,'PositionConstrainFcn',@my_interpolation)
     hA = imfreehand(ca,posA,'Closed',0);
     addNewPositionCallback(hA,@my_interpolation)%callback my_interpolation when drawing is dragged
     hB = imfreehand(ca,posB,'Closed',0);
@@ -103,8 +101,8 @@ my_interpolation();
         xB = newposB(:,1);
         
         %get the coordinates of those pixel under the line drawn
-        [cxA,cyA,cA] = improfile(alldata,xA,yA);% cA and cB are the intensities not needed
-        [cxB,cyB,cB] = improfile(alldata,xB,yB);
+        [cxA,cyA,~] = improfile(alldata,xA,yA);% ~ are the intensities not needed
+        [cxB,cyB,~] = improfile(alldata,xB,yB);
         
 %         %check that the lines are made of a set of pixels          
 %         plot(cxA,cyA,'.b','MarkerSize',5);
@@ -146,8 +144,8 @@ end
 
 % Plot borders in data
 function my_ShowBorders(posf1,posf2)
-%     plot(posf1(:,1),posf1(:,2),'.b','MarkerSize',15);
-%     plot(posf2(:,1),posf2(:,2),'.g','MarkerSize',15);
+    plot(posf1(:,1),posf1(:,2),'.b','MarkerSize',15);
+    plot(posf2(:,1),posf2(:,2),'.g','MarkerSize',15);
 end
 % Read position of border from files
 function [posf1,posf2] = my_ReadBorderfiles(~)
@@ -155,7 +153,7 @@ function [posf1,posf2] = my_ReadBorderfiles(~)
     prompt = {'Insert file name for the first border:' ' Inserte file name for the second border:'};
     titl = 'Load coordinates from txt files';
     num_line = 1;
-    definput = {'stm_border.txt','nfesem_border.txt'};
+    definput = {'border2.txt','border1.txt'};
     files = inputdlg(prompt,titl,num_line,definput);
     filenam1 = char(files(1));
     filenam2 = char(files(2));
@@ -165,19 +163,25 @@ function [posf1,posf2] = my_ReadBorderfiles(~)
         msg=sprintf('no file found with that name, please ensure you selecte an existing file');
         msgbox(msg);
     else
-    posf1 = textscan(f1,'%f %f');%read the coordinates in the file f1 and save in posf1
-    posf2 = textscan(f2,'%f %f');%read the coordinates in the file f2 and save in posf2
+    posf1 = textscan(f1,'%f %f', 'TreatAsEmpty',{'NaN','nan','na','NA'});%read the coordinates in the file f2 and save in posf2
+    posf2 = textscan(f2,'%f %f', 'TreatAsEmpty',{'NaN','nan','na','NA'});%read the coordinates in the file f2 and save in posf2
     posf1 =cell2mat(posf1);
     posf2 =cell2mat(posf2);
     fclose('all');
     msg=sprintf('Coordinates loaded from %s and %s files',filenam1,filenam2);
     msgbox(msg);
-    %check nan values has to be done
     
-% % %     nanindx1= isnan(posf1(:));
-% % %     nanindx2= isnan(posf1(:));
-% % %     posf1(nanindx1(:))=[];
-% % %     posf2(nanindx2(:))=[];
+    %check nan values inside the 
+    if ~isempty(find(isnan(posf2),1))
+        posf2(isnan(posf2))=[];%remove nan
+        posf2 = reshape(posf2,[size(posf2,2)/2,2]);%reshape the set of points in 2 colomns(x and y)
+    end
+    
+    if ~isempty(find(isnan(posf1),1))
+        posf1(isnan(posf1))=[];%remove nan
+        posf1 = reshape(posf1,[size(posf1,2)/2,2]);%reshape the set of points in 2 colomns(x and y)
+    end
+    
     end
 
 end
