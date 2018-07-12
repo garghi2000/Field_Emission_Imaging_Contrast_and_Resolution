@@ -27,7 +27,7 @@ my_PlotProfLine(pos);%Plot the profile line
 
 %Plot Data
 function my_PlotData(alldata)
-figure('Name','Data','NumberTitle','off','Units','centimeters','pos', [5 5 20 20])
+figure('Name','Data','NumberTitle','off','Units','normalized','pos', [0.0943 0.1667 0.3774 0.6667])
 imagesc(alldata);
 strtitle = sprintf('Left Click and drag to draw the line for a profile analysis');
 title(strtitle);
@@ -51,7 +51,7 @@ function my_PlotProfLine(pos)
     n = findobj('type','figure');
     n = length(n);
     if n <2 %create the figure for the profile line
-        figure('Name','Profile Line','NumberTitle','off','Units','centimeters','pos', [25 5 15 10]) 
+        figure('Name','Profile Line','NumberTitle','off','Units','normalized','pos', [0.4717 0.1667 0.2830 0.3333]) 
     else %if the figure already exists it change the current figure to overwrite the profile
     PrlinFig =  findobj('type','figure','Name','Profile Line');
     set(0,'CurrentFigure',PrlinFig);%makes the Profile line figure the current figure

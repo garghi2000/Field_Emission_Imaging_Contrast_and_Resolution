@@ -47,7 +47,7 @@ function my_calculate_resolution(cutposA,cutposB)
     rhis = findobj('type','figure','Name','reshist');
     if isempty(rhis)
         
-    figure('Name','reshist','NumberTitle','off','Units','centimeters','pos', [22 2 12 8])
+    figure('Name','reshist','NumberTitle','off','Units','normalized','pos', [0.4151 0.0667 0.2264 0.2667])
     else
         set(0,'CurrentFigure',rhis);%makes the histogram figure the current figure
     end
@@ -147,6 +147,7 @@ function my_ShowBorders(posf1,posf2)
     plot(posf1(:,1),posf1(:,2),'.b','MarkerSize',15);
     plot(posf2(:,1),posf2(:,2),'.g','MarkerSize',15);
 end
+
 % Read position of border from files
 function [posf1,posf2] = my_ReadBorderfiles(~)
 
@@ -190,7 +191,7 @@ end
 
 % Plot the data
 function my_Plotdata(alldata)
-    figure('Name','Data','NumberTitle','off','Units','centimeters','pos', [2 2 20 20])
+    figure('Name','Data','NumberTitle','off','Units','normalized','pos', [0.0377 0.0667 0.3774 0.6667])
     imagesc(alldata);
 my_SetImageDefaultProperties(alldata);%see the function
     hold on %keep the figure for next plot

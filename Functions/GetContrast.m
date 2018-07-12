@@ -38,7 +38,7 @@ my_Plotdata(alldata);%see the function
     addNewPositionCallback(regOfIntA,@my_Show_Select_regions_and_start_calculations)
 
     h = msgbox({'Region A selected,' 'now select a region B'});%message box after ending the drawing
-    set(h,'Units','centimeters','pos',[15 15 4 2])
+    set(h,'Units','normalized','pos',[0.2830 0.5000 0.0755 0.0667])
     uiwait(h);
     tip = sprintf('Click and drag the mouse to \ndraw the contour of the Region B');%hint as title
     tip = compose(tip);
@@ -73,7 +73,7 @@ maskB = my_Mask(regOfIntB);%see the function
 
     AB = findobj('Type','figure','Name','Region A & B');
     if isempty(AB)
-        figure('Name','Region A & B','NumberTitle','off','Units','centimeters','pos', [22 2 9 9])
+        figure('Name','Region A & B','NumberTitle','off','Units','normalized','pos', [0.4151 0.0667 0.1698 0.3000])
     else
         set(0,'CurrentFigure',AB);%makes the Redion A figure the current figure
     end
@@ -102,7 +102,7 @@ function my_Show_hist(maskA,maskB)
 
     hisfig = findobj('Type','figure','Name','histograms');
     if isempty(hisfig)
-        figure('Name','histograms','NumberTitle','off','Units','centimeters','pos', [22 14 12 8])
+        figure('Name','histograms','NumberTitle','off','Units','normalized','pos', [0.4151 0.4667 0.2264 0.2667])
     else
         set(0,'CurrentFigure',hisfig);%makes the histograms figure the current figure
     end
@@ -142,7 +142,7 @@ function contrast = my_Calculate_contrast(Areg,Breg)
     
     Contrastperlinefig = findobj('Type','figure','Name','Contrast per line');
     if isempty(Contrastperlinefig)%check if the figure already exists, in that case overwrite it
-        figure('Name','Contrast per line','NumberTitle','off','Units','centimeters','pos', [34 14 12 8])
+        figure('Name','Contrast per line','NumberTitle','off','Units','normalized','pos', [0.6415 0.4667 0.2264 0.2667])
     else
         set(0,'CurrentFigure',Contrastperlinefig);%makes the histogramms figure the current figure
     end
@@ -157,7 +157,7 @@ end
 
 % Plot the data
 function my_Plotdata(alldata)
-    figure('Name','Data','NumberTitle','off','Units','centimeters','pos', [2 2 20 20])
+    figure('Name','Data','NumberTitle','off','Units','normalized','pos', [0.0377 0.0667 0.3774 0.6667])
     imagesc(alldata);
 my_SetImageDefaultProperties(alldata);%see the function
     hold on %keep the figure for next plot

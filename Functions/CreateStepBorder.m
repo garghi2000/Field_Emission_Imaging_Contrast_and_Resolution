@@ -44,7 +44,7 @@ my_SavePoints(pos);%store the points in a file txt
 % Plot the data
 function my_Plotdata(alldata)
     
-    figure('Name','Data','NumberTitle','off','Units','centimeters','pos', [2 2 20 20])
+    figure('Name','Data','NumberTitle','off','Units','normalized','pos', [0.0377 0.0667 0.3774 0.6667])
     imagesc(alldata);
     tip= ['Click and drag the mouse to draw the contour'];
     title(tip)
@@ -67,7 +67,7 @@ function mask = my_Mask(alldata)
         mask=mask.*alldata;
         msk = findobj('Type','figure','Name','Mask');
         if isempty(msk)
-            figure('Name','Mask','NumberTitle','off','Units','centimeters','pos', [22 2 8 8])
+            figure('Name','Mask','NumberTitle','off','Units','normalized','pos',[0.4151 0.0667 0.1509 0.2667])
         else
             set(0,'CurrentFigure',msk);%makes the Redion A figure the current figure
         end
@@ -131,7 +131,7 @@ function pos = my_Findstep(alldata,mask)
     close(fitbar);
     
     % plot the image with the boundary points found
-    figure('Name','Border','NumberTitle','off','Units','centimeters','pos', [2 2 20 20])
+    figure('Name','Border','NumberTitle','off','Units','normalized','pos', [0.0377 0.0667 0.3774 0.6667])
     imagesc(alldata);
     tip= ['Border'];
     title(tip)

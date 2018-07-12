@@ -35,7 +35,7 @@ end
 
 % Plot the data
 function my_Plotdata(alldata)
-    figure('Name','Data','NumberTitle','off','Units','centimeters','pos', [2 2 20 20])
+    figure('Name','Data','NumberTitle','off','Units','normalized','pos', [0.0377 0.0667 0.3774 0.6667])
     imagesc(alldata);
 my_SetImageDefaultProperties(alldata);%see the function
     hold on %keep the figure for next plot
