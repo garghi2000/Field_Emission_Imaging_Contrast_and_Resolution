@@ -1,10 +1,11 @@
 function GetResolution(alldata)
 
 %% Main Part
+
 my_Plotdata(alldata);%see the function
-[posA,posB] = my_ReadBorderfiles();
+[posA,posB] = my_ReadBorderfiles();%see the function
 %my_ShowBorders(posA,posB);%uncomment to see the original files points
-my_MakeBorderRoi(posA,posB);
+my_MakeBorderRoi(posA,posB);%see the function
 
 
 %% Function used in this code
@@ -62,17 +63,6 @@ function my_calculate_resolution(cutposA,cutposB)
     ylabel('Incidence');
     set(resh,'FaceColor','r','EdgeColor','r');
     title({tltres tltdisp});
-    % % % % % %Compute cross correlation
-% % % % % XC=xcorr2(double(img1)-mean(mean(img1)),double(img2)-mean(mean(img2)));
-% % % % % 
-% % % % % %Get cross correlation max
-% % % % % [M1, I1]=max(abs(XC));
-% % % % % [~, Xoff]=max(M1);  %X is the second dimention!!!
-% % % % % Yoff=I1(Xoff);
-% % % % % 
-% % % % % %Remove img2 size to get offset
-% % % % % Xoff=Xoff-size(img2,2);
-% % % % % Yoff=Yoff-size(img2,1);
     
 end
    
@@ -118,15 +108,11 @@ my_interpolation();
         
         %delete points on those lines where one of the 2 borders do not exist
         %x coordinates
-        cxA(cyA<iline) = [];
-        cxB(cyB<iline) = [];
-        cxA(cyA>fline) = [];
-        cxB(cyB>fline) = [];
+        cxA(cyA<=iline | cyA>=fline) = [];
+        cxB(cyB<=iline | cyB>=fline) = [];
         %y coordinates
-        cyA(cyA<iline) = [];
-        cyB(cyB<iline) = [];
-        cyA(cyA>fline) = [];
-        cyB(cyB>fline) = [];
+        cyA(cyA<=iline | cyA>=fline) = [];
+        cyB(cyB<=iline | cyB>=fline) = [];
 
         %cutted positions stored
         cutposA = [cxA cyA];%coordinates separated in different vectors
@@ -139,6 +125,12 @@ my_interpolation();
         my_calculate_resolution(cutposA,cutposB);
 
     end
+
+end
+
+% Rotation applyed to one of the borders
+function my_rotation(~)
+
 
 end
 
@@ -186,8 +178,6 @@ function [posf1,posf2] = my_ReadBorderfiles(~)
     end
 
 end
-
-
 
 % Plot the data
 function my_Plotdata(alldata)
