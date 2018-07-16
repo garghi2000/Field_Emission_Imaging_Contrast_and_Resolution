@@ -3,6 +3,7 @@ This repository has been created by Gabriele Bertolini with the purpose of makin
 
 ## Content
 The repository is divided in two sections:
+* Manual: a pdf user guide to explain the algorithm of the functions;
 * Functions: UI functions used for analysing and processing images;
 * Scripts: some codes which load the chosen images and call the UI functions for data analysis. 
 
