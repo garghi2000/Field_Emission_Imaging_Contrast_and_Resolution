@@ -5,10 +5,40 @@ function GetResolution(alldata)
 my_Plotdata(alldata);%see the function
 [posA,posB] = my_ReadBorderfiles();%see the function
 %my_ShowBorders(posA,posB);%uncomment to see the original files points
-my_MakeBorderRoi(posA,posB);%see the function
-
+[hA,hB] = my_MakeBorderRoi(posA,posB);%see the function
+my_botton_for_rotation();
 
 %% Function used in this code
+% Define botton to rotate one border
+function my_botton_for_rotation()
+    dataaxes = findobj('Type','figure','name','Data');
+    set(0,'CurrentFigure',dataaxes);%makes the Data figure the current figure
+    lasobj = gco;
+    btn_h = uicontrol('Style', 'pushbutton', 'String', 'Rotate the last border selected',...
+    'Units','normalized','Position', [0.25 0.95 0.5 0.05],...
+    'Callback',{@my_botton_for_rotation_callback,lasobj});%pushbotton
+end
+
+% Rotation applyed to one of the borders
+function my_botton_for_rotation_callback(~,~,handles)
+    h_border = handles;
+    if isempty(h_border)
+        	msgbox('Please select first a border', 'Error','error');
+    else
+    pos_bord = h_border.getPosition;
+    
+    prompt = 'Insert the angle [deg](- for clockwise rotations)' ;
+    titl = 'Load rotation angle';
+    num_line = 1;
+    definput = {'90'};
+    theta= double(inputdlg(prompt,titl,num_line,definput));
+    
+    
+    
+    my_rotation();
+    my_interpolation(hA,hB);
+    end
+end
 
 % Calculate resolution and show the histogram
 function my_calculate_resolution(cutposA,cutposB)
@@ -65,72 +95,70 @@ function my_calculate_resolution(cutposA,cutposB)
     title({tltres tltdisp});
     
 end
-   
+
+% This is needed in order to upload everything when the borders are dragged
+function my_interpolation_callback(~)
+    my_interpolation(hA,hB);
+end
+
 % Make borders draggable
-function my_MakeBorderRoi(posA,posB)
+function [hA,hB] = my_MakeBorderRoi(posA,posB)
     
     ca = gca;
     hA = imfreehand(ca,posA,'Closed',0);
-    addNewPositionCallback(hA,@my_interpolation)%callback my_interpolation when drawing is dragged
     hB = imfreehand(ca,posB,'Closed',0);
-    addNewPositionCallback(hB,@my_interpolation)%callback my_interpolation when drawing is dragged
-
+    addNewPositionCallback(hA,@my_interpolation_callback);%callback my_interpolation_callback when drawing is dragged
+    addNewPositionCallback(hB,@my_interpolation_callback);%same
     setColor(hB,'g');
     setColor(hA,'b');
-my_interpolation();
-
-    %interpolate the borders 
-    function my_interpolation(~)
-        newposA = getPosition(hA);%set of points updated
-        newposB = getPosition(hB);%set of points updated
-        
-        %interpolation using improfile
-        yA = newposA(:,2);%coordinates separated in different vectors
-        xA = newposA(:,1);
-        yB = newposB(:,2);
-        xB = newposB(:,1);
-        
-        %get the coordinates of those pixel under the line drawn
-        [cxA,cyA,~] = improfile(alldata,xA,yA);% ~ are the intensities not needed
-        [cxB,cyB,~] = improfile(alldata,xB,yB);
-        
-%         %check that the lines are made of a set of pixels          
-%         plot(cxA,cyA,'.b','MarkerSize',5);
-%         plot(cxB,cyB,'.g','MarkerSize',5);
-         
-        %rounding for having real pixels
-        cyA= round(cyA);
-        cyB= round(cyB);
-        
-        %cut borders for comparison on the same scanline. 
-        iline = max(min(cyA),min(cyB)); %initial line
-        fline = min(max(cyA),max(cyB)); %final line
-        
-        %delete points on those lines where one of the 2 borders do not exist
-        %x coordinates
-        cxA(cyA<=iline | cyA>=fline) = [];
-        cxB(cyB<=iline | cyB>=fline) = [];
-        %y coordinates
-        cyA(cyA<=iline | cyA>=fline) = [];
-        cyB(cyB<=iline | cyB>=fline) = [];
-
-        %cutted positions stored
-        cutposA = [cxA cyA];%coordinates separated in different vectors
-        cutposB = [cxB cyB];%coordinates separated in different vectors
-       
-        %check that the lines were cutted
-%         plot(cxA,cyA,'.b','MarkerSize',5);
-%         plot(cxB,cyB,'.g','MarkerSize',5);
- 
-        my_calculate_resolution(cutposA,cutposB);
-
-    end
+my_interpolation(hA,hB);
 
 end
 
-% Rotation applyed to one of the borders
-function my_rotation(~)
+%interpolate the borders on those scanlines in common 
+function my_interpolation(hA,hB)
+    newposA = getPosition(hA);%set of points updated
+    newposB = getPosition(hB);%set of points updated
 
+    %interpolation using improfile
+    yA = newposA(:,2);%coordinates separated in different vectors
+    xA = newposA(:,1);
+    yB = newposB(:,2);
+    xB = newposB(:,1);
+
+    %get the coordinates of those pixel under the line drawn
+    [cxA,cyA,~] = improfile(alldata,xA,yA);% ~ are the intensities not needed
+    [cxB,cyB,~] = improfile(alldata,xB,yB);
+
+%         %check that the lines are made of a set of pixels          
+%         plot(cxA,cyA,'.b','MarkerSize',5);
+%         plot(cxB,cyB,'.g','MarkerSize',5);
+
+    %rounding for having real pixels
+    cyA= round(cyA);
+    cyB= round(cyB);
+
+    %cut borders for comparison on the same scanline. 
+    iline = max(min(cyA),min(cyB)); %initial line
+    fline = min(max(cyA),max(cyB)); %final line
+
+    %delete points on those lines where one of the 2 borders do not exist
+    %x coordinates
+    cxA(cyA<=iline | cyA>=fline) = [];
+    cxB(cyB<=iline | cyB>=fline) = [];
+    %y coordinates
+    cyA(cyA<=iline | cyA>=fline) = [];
+    cyB(cyB<=iline | cyB>=fline) = [];
+
+    %cutted positions stored
+    cutposA = [cxA cyA];%coordinates separated in different vectors
+    cutposB = [cxB cyB];%coordinates separated in different vectors
+
+    %check that the lines were cutted
+%         plot(cxA,cyA,'.b','MarkerSize',5);
+%         plot(cxB,cyB,'.g','MarkerSize',5);
+
+    my_calculate_resolution(cutposA,cutposB);
 
 end
 

@@ -5,8 +5,12 @@ my_Plotdata(alldata);%see the function
 
     tip= {'Click and drag the mouse to' 'draw the border'};%hint as title
     title(tip)
+    hca = gca;
+    fcn = makeConstrainToRectFcn('imfreehand',get(gca,'XLim'),...
+        get(gca,'YLim'));%limit where the border is draggable
+    borderOfInt = imfreehand(hca,'Closed',0,'PositionConstraintFcn',fcn);%draw region A inside the axes
 
-    borderOfInt = imfreehand('Closed',0);%draw region A
+%     borderOfInt.setPositionConstraintFcn(fcn);
     setColor(borderOfInt,'k');
     tip= {'Double-clicking on the drawn line' 'to save it as set of x and y coordinates'};%hint as title
     title(tip)
@@ -22,7 +26,7 @@ function my_SavePoints(pos)
     prompt = {'Insert file name:'};
     titl = 'Save coordinates in txt file';
     dims = [1 40];
-    definput = {'border.txt'}
+    definput = {'border.txt'};
     filename = char(inputdlg(prompt,titl,dims,definput));
     fid = fopen(filename,'wt');
     pos = pos';

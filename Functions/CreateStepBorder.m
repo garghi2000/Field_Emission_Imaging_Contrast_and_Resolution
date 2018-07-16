@@ -59,7 +59,8 @@ function mask = my_Mask(alldata)
     addNewPositionCallback(regOfInt,@nastyfcn)
     tip= {'Double-clicking on the drawn contourt to start' 'the tanh fit and find the border'...
         'inside using the step positions'};%hint as title
-    title(tip)
+    title(tip)    
+    wait(regOfInt);
     mask = nastyfcn();
     function mask = nastyfcn(~)
         mask=createMask(regOfInt);%create a binary img with 1s inside the region and 0 outside
@@ -77,7 +78,7 @@ function mask = my_Mask(alldata)
         title(tip);
 my_SetSmallImageDefaultProperties(alldata);
     end
-    wait(regOfInt);
+
 end
 
 % Do the routine to find the boundary points
@@ -113,8 +114,17 @@ function pos = my_Findstep(alldata,mask)
             %fit
             cfit = lsqnonlin(@my_tanhfit,guessCoef,[],[],[],xnonzero,mask(i,xnonzero));
             cfit = abs(cfit);%avoiding negative coeff.
-            posx(i) = cfit(3);
-            
+            cadata = findobj('Type','figure','Name','Data');%handle of the figure data
+            dataaxes = get(cadata,'CurrentAxes');
+
+            %check if the step position fall outside of the image
+            if cfit(3) >= max(get(dataaxes,'XLim'))
+                posx(i) = max(get(dataaxes,'XLim'));
+            elseif cfit(3) <= min(get(dataaxes,'XLim'))
+                posx(i) = min(get(dataaxes,'XLim'));
+            else
+                posx(i) = cfit(3);
+            end
 %%check every fit on the step
 %             fit=(-cfit(1).*tanh(cfit(2).*(xnonzero-cfit(3)))-cfit(4));
 %             fittest = (-guessCoef(1).*tanh(guessCoef(1).*(xnonzero-guessCoef(3)))-guessCoef(4));   
