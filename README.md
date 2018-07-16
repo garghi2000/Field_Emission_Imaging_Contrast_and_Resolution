@@ -11,5 +11,4 @@ The repository is divided in two sections:
 The codes contained in this folder use the [*MATLAB NanoLib library*](https://github.com/ethz-micro/matlab_nanonis). Before clone the repository or download the ZIP file, ensure to have it.
 
 ## Licence
-
 Distributed under the GNU General Public License, Version 3.0. (See accompanying file [LICENSE](LICENSE) or copy at [https://www.gnu.org/licenses/gpl-3.0.html](https://www.gnu.org/licenses/gpl-3.0.html))

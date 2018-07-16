@@ -2,28 +2,26 @@ function [maskA,maskB,contrast] = GetContrast(alldata)
 
 %-----------------------------------------------------------------------------------------
 %   Readme
-%   Hint: all figures created by this function have the position and the
-%   sizes set in centimetres respect to the botton left corner of the
-%   screen. Changed them using figure('Unit','Centimeters','pos',[.. .. .. ..])to
-%   better suit on your screen.
 % 
 %   This function does the following:
 %   
-%   - Plots the data "alldata" using the matrix representation(origin on topleft corner);
-%   The aspect of the figure is defined by the function SetImageDefaultProperties()
-%   - Let the user to draw a first region A inside the image loaded by clicking 
-%   and dragging the mouse and a second region B.
-%   - The mean value per line of the two regions is calculated and plot as contrast per line;
-%   - The total mean value of the two regions is calculated and printed as title of figure contrast per line;
-%   - The contrast per line and the total contrast is calculated as following: 
-%   Contrast = |(A - B)/(A + B)|   where A and B are the mean values of the regions.
-%   - Plots the histograms of the values for the two regions, to justify the total contrast
-%   looking at the mean values. 
-%   - Plots the histogram of the contrast for every line. If the line
-%   doesn't contain value for one of the two regions, it forces the contrast
-%   to be zero, and it is not counted on the histogram.
-%   
-%                                                       G.B. 04.07.2018
+% - Plots alldata matrix using the colormap defined by nanonisMap (NanoLib/op/nanonisMap.m).
+% Note: The x and y axis are in pixels and the origin is top/left corner(matrix representation).
+% - Lets the user to draw a first region A inside the image loaded by clicking 
+%  and dragging the mouse.
+% - Lets the user to draw a second region B inside the image loaded by clicking 
+%  and dragging the mouse.
+% - Plots the histogram of the values for the two regions. A normal distribution might
+% justify a total contrast calculation. 
+% - Plots the histogram of the contrast for every line. If the line doesn't contain values for
+% one of the two regions, then that scan line is not counted for the histogram and the contrast
+% calculation.
+% - The contrast per line and the total contrast is calculated as following: 
+% Contrast = |(A - B)/(A + B)| where A and B are the mean values of the regions.
+% - The mean values of the two regions and the total contrast are shown in the title of the
+% ''Contrast per line'' figure.                                                  
+%
+%                                                                           G.B. 04.07.2018
 %-----------------------------------------------------------------------------------------
 
 %% Main Part

@@ -1,4 +1,17 @@
 function pos = CreateFreeHandBorder(alldata)
+%-----------------------------------------------------------------------------------------
+%   Readme
+% 
+%   This code does the following:
+%
+% - Plots alldata matrix using the colormap defined by nanonisMap (NanoLib/op/nanonisMap.m).
+% Note:The x and y axis are in pixels and the origin is top/left corner(matrix representation).
+% - Allows the user to draw a border inside the image loaded by clicking and dragging the mouse.
+% - When double click on the line, the $x$ and $y$ coordinates of those points are saved
+% in the txt file typed.
+%                                                                          G.B. 08.06.2018
+%-----------------------------------------------------------------------------------------
+
 %% Main part
 
 my_Plotdata(alldata);%see the function
@@ -10,7 +23,6 @@ my_Plotdata(alldata);%see the function
         get(gca,'YLim'));%limit where the border is draggable
     borderOfInt = imfreehand(hca,'Closed',0,'PositionConstraintFcn',fcn);%draw region A inside the axes
 
-%     borderOfInt.setPositionConstraintFcn(fcn);
     setColor(borderOfInt,'k');
     tip= {'Double-clicking on the drawn line' 'to save it as set of x and y coordinates'};%hint as title
     title(tip)

@@ -1,5 +1,21 @@
 function GetResolution(alldata)
-
+%-----------------------------------------------------------------------------------------
+%   Readme
+%  
+%   This script does the following:
+%   
+% - Plots alldata matrix using the colormap defined by nanonisMap (NanoLib/op/nanonisMap.m).\\
+% Note: The x and y axis are in pixels and the origin is top/left corner(matrix representation).
+% - Lets the user load two text files which are supposed to contain two set of points inside the image representing the borders the user wants to compare.
+% - Plots the borders from the files.
+% - The code starts to compare for every line the $x$ position of the of the first border with the $x'$ position of the second border, creating the histogram called ''reshist'' of the displacement. Those scan line that do not contain points of one of the two borders are excluded.
+% - When one of the two borders is dragged the histogram is updated.
+% - The total shift between the two borders and the standard deviation is shown in the title of the reshist figure.
+% - A button to rotate one of the two borders is also present on top of the Data figure. It gives to the user the possibility to rotate one of the borders respect to a point chosen.  
+%  
+%
+%                                                       G.B. 08.06.2018
+%-----------------------------------------------------------------------------------------
 %% Main Part
 
 my_Plotdata(alldata);%see the function
