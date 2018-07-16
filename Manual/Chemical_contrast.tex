@@ -1,0 +1,44 @@
+% !TEX encoding = UTF-8 Unicode
+
+\input{header.tex}
+
+\newcommand{\mcode}[1]{\texttt{>\.> #1}}
+
+\renewcommand{\familydefault}{\sfdefault}
+\setlength\parindent{0pt}
+
+\newcommand{\+}[1]{\item \textbf{#1}}
+
+\newcommand{\nanonis}{\href{http://www.specs-zurich.com/en/home.html;jsessionid=FCD8A587EE447665C3F4A8CC374671EE}{Nanonis SPM Control System\texttrademark}}
+\newcommand{\matlab}{MATLAB\texttrademark}
+
+
+%Title
+\title{Chemical contrast user guide}
+%Utiliser \breakline plutôt que \\ dans du texte normal
+%\author{Quentin Peter\\{\small \mail{qpeter@stud.phys.ethz.ch}}}
+\author{
+ETH Zurich\\
+Laboratory of Solid State Physics\\\vspace{.5em}
+Microstructure Research\\ 
+{\small Gabriele Bertolini - \mail{bertolig@phys.ethz.ch}}
+}
+\date{\today}
+
+\begin{document}
+\maketitle
+These scripts and functions have been created by Gabriele Bertolini with the purpose of making simple and clear the data analysis performed for the scientific article:... and showed in its supplementary information.\\
+\textbf{Note:} Matlab 2015a or new versions and the NanoLib library are needed to run these codes.
+In future the functions will be integrated in the NanoLib library under the folder NanoLib/sxm/op. 
+\newpage
+\tableofcontents
+
+\include{Scripts}
+%-------------------------------------------------------------------------------%
+%  Description of scripts                                                                   %
+%-------------------------------------------------------------------------------%
+%\include{Functions}
+%-------------------------------------------------------------------------------%
+%  Description of functions                                             %
+%-------------------------------------------------------------------------------%
+\end{document}
