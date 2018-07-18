@@ -29,31 +29,80 @@ my_botton_for_rotation();
 function my_botton_for_rotation()
     dataaxes = findobj('Type','figure','name','Data');
     set(0,'CurrentFigure',dataaxes);%makes the Data figure the current figure
-    lasobj = gco;
-    btn_h = uicontrol('Style', 'pushbutton', 'String', 'Rotate the last border selected',...
+    btn_h = uicontrol('Style', 'pushbutton', 'String', 'Rotate the border',...
     'Units','normalized','Position', [0.25 0.95 0.5 0.05],...
-    'Callback',{@my_botton_for_rotation_callback,lasobj});%pushbotton
+    'Callback',@my_botton_for_rotation_callback);%pushbotton
 end
 
 % Rotation applyed to one of the borders
-function my_botton_for_rotation_callback(~,~,handles)
-    h_border = handles;
-    if isempty(h_border)
-        	msgbox('Please select first a border', 'Error','error');
+function my_botton_for_rotation_callback(btn_handle,~)
+    btn_handle.Visible ='off';
+    title('Use the mouse to select the border to rotate');
+    w = waitforbuttonpress;
+    border_line = gco;
+    posbl = [border_line.XData ; border_line.YData]';
+    poshA= hA.getPosition;
+    poshB = hB.getPosition;
+    if w == 1
+        msgbox('A key botton was press, please use the mouse','error','error');
     else
-    pos_bord = h_border.getPosition;
-    
-    prompt = 'Insert the angle [deg](- for clockwise rotations)' ;
-    titl = 'Load rotation angle';
-    num_line = 1;
-    definput = {'90'};
-    theta= double(inputdlg(prompt,titl,num_line,definput));
-    
-    
-    
-    my_rotation();
-    my_interpolation(hA,hB);
+
+        if isequal(posbl,poshA)
+            bl=hA;
+            msgb1= msgbox('Blue border has been selected','Border selection');
+            uiwait(msgb1);
+        elseif isequal(posbl,poshB)
+            bl=hB;
+            msgb2= msgbox('Green border has been selected','Border selection');
+            uiwait(msgb2);
+        else
+            msgbox('Please use the mouse to select one of the borders','error','error');
+            dataaxes = findobj('Type','figure','name','Data');
+            set(0,'CurrentFigure',dataaxes);%makes the Data figure the current figure
+            title('You can dragg the borders for a better overlap');
+            btn_handle.Visible ='on';
+            return
+        end
+        prompt = 'Insert the angle [deg](- for clockwise rotations)' ;
+        titl = 'Load rotation angle';
+        num_line = 1;
+        definput = {'90'};
+        theta= str2double(inputdlg(prompt,titl,num_line,definput));
+        title({'Choose the center of the rotation' ' by clicking a point in the figure'});
+        CofRot=impoint;% get center using impoint maltab functin
+        CofRotpos= CofRot.getPosition;% get center of rotation by clicking in the image
+        newpos = my_rotation_object(CofRotpos,theta,bl);%new positions after rotation
+        dataaxes = findobj('Type','figure','name','Data');
+        set(0,'CurrentFigure',dataaxes);%makes the Data figure the current figure
+        if isequal(bl,hA)
+            delete(hA,CofRot);% remove old roi object
+            delete(CofRot);% remove old point object
+            hA = imfreehand(gca,newpos,'Closed',0);% create new(rotated) roi object
+            addNewPositionCallback(hA,@my_interpolation_callback);%callback my_interpolation_callback when drawing is dragged
+            setColor(hA,'b');
+        elseif isequal(bl,hB)
+            delete(hB);% remove old roi object
+            delete(CofRot);% remove old point object
+            hB = imfreehand(gca,newpos,'Closed',0);% create new(rotated) roi object
+            addNewPositionCallback(hB,@my_interpolation_callback);%callback my_interpolation_callback when drawing is dragged
+            setColor(hB,'g');
+        end
+        
+        my_interpolation(hA,hB);
+        btn_handle.Visible ='on';
+
     end
+end
+
+function pos_rotated = my_rotation_object(center,theta,object)
+    pos = object.getPosition;
+    pos = pos';%rowlike
+    theta = theta*pi/2/90;%from deg to rad
+    center = repmat([center(1);center(2)], 1, numel(pos(1,:)));% center point rowlike
+    R = [cos(theta) -sin(theta); sin(theta) cos(theta)];%matrix of rotation
+    pos_rotated = R*(pos - center) + center; % rotation respect to the center point
+    pos_rotated= pos_rotated';%columnlike
+
 end
 
 % Calculate resolution and show the histogram
@@ -121,12 +170,15 @@ end
 function [hA,hB] = my_MakeBorderRoi(posA,posB)
     
     ca = gca;
+    title('You can dragg the borders for a better overlap');
+
     hA = imfreehand(ca,posA,'Closed',0);
     hB = imfreehand(ca,posB,'Closed',0);
     addNewPositionCallback(hA,@my_interpolation_callback);%callback my_interpolation_callback when drawing is dragged
     addNewPositionCallback(hB,@my_interpolation_callback);%same
     setColor(hB,'g');
     setColor(hA,'b');
+
 my_interpolation(hA,hB);
 
 end
@@ -182,6 +234,7 @@ end
 function my_ShowBorders(posf1,posf2)
     plot(posf1(:,1),posf1(:,2),'.b','MarkerSize',15);
     plot(posf2(:,1),posf2(:,2),'.g','MarkerSize',15);
+    
 end
 
 % Read position of border from files
