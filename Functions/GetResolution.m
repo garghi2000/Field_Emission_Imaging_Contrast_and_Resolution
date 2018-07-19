@@ -12,7 +12,7 @@ function GetResolution(alldata)
 % - When one of the two borders is dragged the histogram is updated.
 % - The total shift between the two borders and the standard deviation is shown in the title of the reshist figure.
 % - A button to rotate one of the two borders is also present on top of the Data figure. It gives to the user the possibility to rotate one of the borders respect to a point chosen.  
-%  
+% - A threshold on the displacement calculation is used to cut those scan line where the step border fails in finding the position of the step. 
 %
 %                                                       G.B. 08.06.2018
 %-----------------------------------------------------------------------------------------
