@@ -36,22 +36,22 @@ end
 
 % Rotation applyed to one of the borders
 function my_botton_for_rotation_callback(btn_handle,~)
-    btn_handle.Visible ='off';
-    title('Use the mouse to select the border to rotate');
-    w = waitforbuttonpress;
-    border_line = gco;
-    posbl = [border_line.XData ; border_line.YData]';
-    poshA= hA.getPosition;
-    poshB = hB.getPosition;
-    if w == 1
+    btn_handle.Visible ='off';%make the button unvisible
+    title('Use the mouse to select the border to rotate');%update the title
+    w = waitforbuttonpress;%wait until you select one of the borders
+    border_line = gco;%get the handle of the last selection
+    posbl = [border_line.XData ; border_line.YData]';%take the position of the object selected
+    poshA= hA.getPosition;%to be compare with posbl
+    poshB = hB.getPosition;%to be compare with posbl
+    if w == 1 %
         msgbox('A key botton was press, please use the mouse','error','error');
     else
 
-        if isequal(posbl,poshA)
+        if isequal(posbl,poshA)%comparison to check which border was selected
             bl=hA;
             msgb1= msgbox('Blue border has been selected','Border selection');
-            uiwait(msgb1);
-        elseif isequal(posbl,poshB)
+            uiwait(msgb1);%wait until 
+        elseif isequal(posbl,poshB)%comparison to check which border was selected
             bl=hB;
             msgb2= msgbox('Green border has been selected','Border selection');
             uiwait(msgb2);
@@ -59,7 +59,7 @@ function my_botton_for_rotation_callback(btn_handle,~)
             msgbox('Please use the mouse to select one of the borders','error','error');
             dataaxes = findobj('Type','figure','name','Data');
             set(0,'CurrentFigure',dataaxes);%makes the Data figure the current figure
-            title('You can dragg the borders for a better overlap');
+            title('You can drag the borders for a better overlap');
             btn_handle.Visible ='on';
             return
         end
@@ -67,13 +67,14 @@ function my_botton_for_rotation_callback(btn_handle,~)
         titl = 'Load rotation angle';
         num_line = 1;
         definput = {'90'};
-        theta= str2double(inputdlg(prompt,titl,num_line,definput));
+        theta= str2double(inputdlg(prompt,titl,num_line,definput));%angle for rotation
         title({'Choose the center of the rotation' ' by clicking a point in the figure'});
         CofRot=impoint;% get center using impoint maltab functin
         CofRotpos= CofRot.getPosition;% get center of rotation by clicking in the image
         newpos = my_rotation_object(CofRotpos,theta,bl);%new positions after rotation
         dataaxes = findobj('Type','figure','name','Data');
         set(0,'CurrentFigure',dataaxes);%makes the Data figure the current figure
+        title('You can drag the borders for a better overlap');
         if isequal(bl,hA)
             delete(hA,CofRot);% remove old roi object
             delete(CofRot);% remove old point object
@@ -117,27 +118,26 @@ function my_calculate_resolution(cutposA,cutposB)
         Nscanline = unique(cutposA(:,2));%vector containing index of scanline common(y coords)
         
     else
-        Nscanline = sort(unique(cutposB(:,2)));
+        Nscanline = sort(unique(cutposB(:,2)));% sort y coords not repeated
     end
     res = nan(size(Nscanline,1),1);
     for i = Nscanline'
         
         k = i - (Nscanline(1)-1);%index starting from 1
-        %part that need to be improved!!! The problem comes qhen there are
-        %more than 1 x coord for scanline(every time a border contains
-        %horizontal segments:
-        %instead of mean those x coordinates at the same scanline it could check which are
-        %those x coordinate that have minimum distances
-        
-        xmA = mean(cxA(cyA==i));%this takes the mean value of the x position at same scanline
-        xmB = mean(cxB(cyB==i));%this takes the mean value of the x position at same scanline
-        res(k) = xmA-xmB;%displacement defined as the different between averaged x coords
-
-%         Calculate distance between 2 set of points
-%         rng('default') % For reproducibility
-%         X = rand(3,2);
-%         pdist2('euclidean')
-%     
+        %taking the points along the same scan lines which have minimum
+        %distances
+        xAsamey = cxA(cyA==i);% x coord values at the k scan line for the border A
+        xBsamey = cxB(cyB==i);% x coord values at the k scan line for the border B
+        xBsamey = xBsamey'; 
+        BB = repmat(xBsamey,size(xAsamey));
+        AA = repmat(xAsamey,size(xBsamey));
+        DifMatrix = AA-BB;% all differences betweeen x coords of A and x coords of B at k scan line
+        res(k)= min(DifMatrix(:));% res is the minumum between the distances
+        %cutting bad scan lines
+        dThreshold = 35;
+        if abs(res(k))>= dThreshold% distance threshold in px between borders to exclude the scan lines 
+            res(k) = NaN;%cut scan lines that have a creal point outside of the border.
+        end
     
     end
     rhis = findobj('type','figure','Name','reshist');
@@ -148,17 +148,22 @@ function my_calculate_resolution(cutposA,cutposB)
         set(0,'CurrentFigure',rhis);%makes the histogram figure the current figure
     end
     figure(gcf)
+%     res(isnan(res)) = [];%remove nan elements
     resh= histogram(res,50);
-       
+%     fitdist(res,'Normal') %checked if the distribution is normal
     avgDisp=nanmean(res(:));%mean
     sigmaDisp=nanstd(res(:));%standard deviation
-    tltres = sprintf('resolution in px = %.2f',sigmaDisp);
-    tltdisp =sprintf('the shift is = %.2f',avgDisp);
-    xlabel('Displacement by data');
+    tltres = sprintf('(std)resolution = %.2f px',sigmaDisp);
+    tltdisp =sprintf('(x0)shift = %.2f px',avgDisp);
+    tltthrhold =sprintf('threshold used = %.2f px',dThreshold);
+
+    xlabel('Displacement by data [px]');
     ylabel('Incidence');
     set(resh,'FaceColor','r','EdgeColor','r');
-    title({tltres tltdisp});
+    title({tltres tltdisp tltthrhold});
     
+    dataaxes = findobj('Type','figure','name','Data');
+    set(0,'CurrentFigure',dataaxes);%makes the Data figure the current figure
 end
 
 % This is needed in order to upload everything when the borders are dragged
@@ -170,7 +175,7 @@ end
 function [hA,hB] = my_MakeBorderRoi(posA,posB)
     
     ca = gca;
-    title('You can dragg the borders for a better overlap');
+    title('You can drag the borders for a better overlap');
 
     hA = imfreehand(ca,posA,'Closed',0);
     hB = imfreehand(ca,posB,'Closed',0);
@@ -185,6 +190,8 @@ end
 
 %interpolate the borders on those scanlines in common 
 function my_interpolation(hA,hB)
+    
+    
     newposA = getPosition(hA);%set of points updated
     newposB = getPosition(hB);%set of points updated
 
@@ -243,7 +250,7 @@ function [posf1,posf2] = my_ReadBorderfiles(~)
     prompt = {'Insert file name for the first border:' ' Inserte file name for the second border:'};
     titl = 'Load coordinates from txt files';
     num_line = 1;
-    definput = {'border2.txt','border1.txt'};
+    definput = {'stm_border.txt','nfesem_border.txt'};
     files = inputdlg(prompt,titl,num_line,definput);
     filenam1 = char(files(1));
     filenam2 = char(files(2));
