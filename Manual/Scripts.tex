@@ -101,6 +101,7 @@ This function acts as following:
 \item When one of the two borders is dragged the histogram is updated.
 \item The total shift between the two borders and the standard deviation is shown in the title of the reshist figure.
 \item Gives to the user the possibility to rotate one of the borders respect to a point chosen using the button present on top of the Data figure. 
+\item A default threshold of 35 pixels is used to cut out those scan lines where the distance between the points of the different borders was unreasonable big(more then 35 pxs), due to a possible failure of the step border method used to find the border in the nfesem image.
 \end{itemize}
 
 %%\noindent Other examples can be found in the section \ref{sec::examples}.
