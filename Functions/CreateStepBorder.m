@@ -22,24 +22,12 @@ function CreateStepBorder(alldata)
 
 %% Main Part
 
-my_Plotdata(alldata);
 mask = my_Mask(alldata);%Define the region called mask where to find the step
 pos = my_Findstep(alldata,mask);%find the step inside the region selected
 my_SavePoints(pos);%store the points in a file txt
 
 
 %% Functions used in this code
-
-% Plot the data
-function my_Plotdata(alldata)
-    
-    figure('Name','Data','NumberTitle','off','Units','normalized','pos', [0.0377 0.0667 0.3774 0.6667])
-    imagesc(alldata);
-    tip= {'Click and drag the mouse to draw' 'the contour of the region containing the border'};
-    title(tip)
-my_SetImageDefaultProperties(alldata);
-    hold on %keep the figure for next plot
-    end
 
 % Define the region called mask where to find the step
 function mask = my_Mask(alldata)
@@ -127,17 +115,12 @@ function pos = my_Findstep(alldata,mask)
             posx(i) = nan;
             posy(i) = nan;       
         end
-       
+        waitbar(i/size(alldata,1))
     end
     close(fitbar);
     
-    % plot the image with the boundary points found
-    figure('Name','Border','NumberTitle','off','Units','normalized','pos', [0.0377 0.0667 0.3774 0.6667])
-    imagesc(alldata);
-    tip= 'Border';
-    title(tip)
-my_SetImageDefaultProperties(alldata)
-
+    datafigure = findobj('Type','figure','Name','Data');%handle of the figure data
+    set(0,'CurrentFigure',datafigure);
     hold on %keep the figure for next plot
     plot(posx,posy,'-g','MarkerSize',15)
     posx = posx';
@@ -181,21 +164,6 @@ function res=my_tanhfit(p,x,y)
     D = p(4); 
     res=(-abs(A).*tanh(abs(B).*(x-abs(C)))-abs(D))-y;%in case we take Current channel the step is a down step
 
-end
-
-% Set the properties of the current image
-function my_SetImageDefaultProperties(alldata)
-    avg=nanmean(alldata(:));%mean
-    sigma=nanstd(alldata(:));%standard deviation
-    axis square;
-    colormap(sxm.op.nanonisMap(128));% colormap defined by the nanonisMap NanoLib function
-    caxis([avg-2*sigma avg+2*sigma])% Edges of the colormap
-    ca=gca;
-    ca.FontSize = 26;
-    ca.TitleFontSizeMultiplier = 0.8;
-    ca.LineWidth = 2;
-    ca.YLim =  [0 size(alldata,1)];
-    ca.XLim = [0 size(alldata,2)];
 end
 
 % Set the properties of the current image

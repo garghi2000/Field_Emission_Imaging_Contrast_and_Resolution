@@ -14,8 +14,6 @@ function pos = CreateFreeHandBorder(alldata)
 
 %% Main part
 
-my_Plotdata(alldata);%see the function
-
     tip= {'Click and drag the mouse to' 'draw the border'};%hint as title
     title(tip)
     hca = gca;
@@ -49,26 +47,4 @@ function my_SavePoints(pos)
    
 end
 
-% Plot the data
-function my_Plotdata(alldata)
-    figure('Name','Data','NumberTitle','off','Units','normalized','pos', [0.0377 0.0667 0.3774 0.6667])
-    imagesc(alldata);
-my_SetImageDefaultProperties(alldata);%see the function
-    hold on %keep the figure for next plot
-end
-
-% Set the properties of the current image
-function my_SetImageDefaultProperties(alldata)
-    avg=nanmean(alldata(:));%mean
-    sigma=nanstd(alldata(:));%standard deviation
-    axis square;
-    colormap(sxm.op.nanonisMap(128));% colormap defined by the nanonisMap NanoLib function
-    caxis([avg-2*sigma avg+2*sigma])% Edges of the colormap
-    ca=gca;
-    ca.FontSize = 26;
-    ca.TitleFontSizeMultiplier = 0.8;
-    ca.LineWidth = 2;
-    ca.YLim =  [0 size(alldata,1)];
-    ca.XLim = [0 size(alldata,2)];
-end
 end
