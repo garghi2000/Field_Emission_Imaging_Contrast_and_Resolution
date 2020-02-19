@@ -102,6 +102,14 @@ function my_Show_hist(maskA,maskB)
     else
         set(0,'CurrentFigure',hisfig);%makes the histograms figure the current figure
     end
+    
+    TotAreg= abs(nanmean(maskA(:)));%mean value on the TOTAL region A
+    TotBreg= abs(nanmean(maskB(:)));%mean value on the TOTAL region B
+    Totcontrast = (TotAreg - TotBreg)/(TotAreg +TotBreg);%TOTAL contrast
+    %note: absolute values are needed to avoid TOTAL contrast >1.
+    results = sprintf('<RegA> = %.2f \n<RegB> = %.2f \n Total Contrast = %.3f',TotAreg,TotBreg,Totcontrast);
+    %results is used as title on the next figure
+
     figure(gcf)
     hA = histogram(maskA(:),100);%histogram of the data inside region A
     set(hA,'FaceColor','k','EdgeColor','k','FaceAlpha',0.6);
@@ -110,7 +118,7 @@ function my_Show_hist(maskA,maskB)
     set(hB,'FaceColor','r','EdgeColor','r','FaceAlpha',0.6);
 my_SetHistDefaultProperties();%see the function
     hold off
-
+    title(results)
 end
 
 % Calculate the total contrast, the contrast per line and plot them
@@ -119,13 +127,8 @@ function contrast = my_Calculate_contrast(Areg,Breg)
     xlineBreg = zeros(1,size(Areg,1));%initialization
     xlineAreg = xlineBreg;%initialization
     contrast = xlineAreg;%initialization
-    TotAreg= abs(nanmean(Areg(:)));%mean value on the TOTAL region A
-    TotBreg= abs(nanmean(Breg(:)));%mean value on the TOTAL region B
-    Totcontrast = (TotAreg - TotBreg)/(TotAreg +TotBreg);%TOTAL contrast
-    %note: absolute values are needed to avoid TOTAL contrast >1.
-    results = sprintf('<RegA> = %.2f \n<RegB> = %.2f \n Total Contrast = %.2f',TotAreg,TotBreg,Totcontrast);
-    %results is used as title on the next figure
-
+   
+    
     for i=1:size(Areg,1)%for loop on the lines
         xlineAreg(i) = abs(nanmean(Areg(i,:)));%mean value on the region A of the i-th line 
         xlineBreg(i) = abs(nanmean(Breg(i,:)));%mean value on the region B of the i-th line 
@@ -135,6 +138,10 @@ function contrast = my_Calculate_contrast(Areg,Breg)
         %in, the contrast is nan, so it is not counted on the contrast per
         %line
     end
+    avg_contrast_per_line = nanmean(contrast);
+    std_contrast_per_line =nanstd(contrast);
+    %results_perline will be the title with some statistical values
+    results_perline = sprintf('<contrast per line> = %.3f \n Std = %.3f',avg_contrast_per_line,std_contrast_per_line);
     
     Contrastperlinefig = findobj('Type','figure','Name','Contrast per line');
     if isempty(Contrastperlinefig)%check if the figure already exists, in that case overwrite it
@@ -145,8 +152,10 @@ function contrast = my_Calculate_contrast(Areg,Breg)
     figure(gcf)
     hcontrast= histogram(contrast,100);%make the histogram of the contrast per line
     set(hcontrast,'FaceColor','r','EdgeColor','r');
-    title(results);%on the title the total values appear
-my_SetHistDefaultProperties();%see the function
+%     histfit(contrast,100);%make the histogram of the contrast per line
+%     with a gaussian plot
+    title(results_perline);%on the title the total values appear
+    my_SetHistDefaultProperties();%see the function
     ca=gca;
     ca.XLabel.String = 'Contrast per line';
 end
@@ -155,7 +164,7 @@ end
 function my_SetHistDefaultProperties()
     ca=gca;
     ca.YLabel.String = 'Incidence';
-    ca.FontSize = 18;
+    ca.FontSize = 16;
     ca.TitleFontSizeMultiplier = 0.8;
     ca.LineWidth = 2;
 end

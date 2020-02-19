@@ -1,6 +1,6 @@
 # matlab_chemical_contrast_supplementary_information
-This repository has been created by Gabriele Bertolini with the purpose of making simple and clear the data analysis performed and showed on the scientific article:...
-
+This repository has been created by Gabriele Bertolini with the purpose of making simple and clear the data analysis performed and showed on the supplementary information of the scientific article: Sensing contact potentials in the Field emission regime of scanning
+tunneling microscopy
 ## Content
 The repository is divided in two sections:
 * Manual: a pdf user guide to explain the algorithm of the functions;
